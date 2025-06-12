@@ -2,91 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta¯http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Apex Legends Randomizer</title>
+  <title>Random Movie Picker</title>
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Generate a random Apex Legends character with our fast and free randomizer. Fun slot-machine animation, no login required!" />
-  <meta name="keywords" content="Apex Legends, randomizer, legend picker, dark theme, gaming tools" />
+  <meta name="description" content="Pick a random movie from your watchlist. Fun scale animation, no login required!" />
+  <meta name="keywords" content="movie randomizer, film picker, random movie, watchlist tool, dark theme" />
   <link rel="canonical" href="https://yourdomain.com/" />
 
   <!-- Tailwind & Styles -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @keyframes slotFlip {
-      0% { transform: translateY(-10%); opacity: 0.5; }
-      50% { transform: translateY(10%); opacity: 1; }
-      100% { transform: translateY(0); opacity: 1; }
+    @keyframes scaleFlip {
+      0% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
     }
-    .slot-flip { animation: slotFlip 0.1s ease-in-out infinite; }
+    .slot-flip { animation: scaleFlip 0.15s ease-in-out infinite; }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
-  <div class="w-full max-w-md">
-    <h1 class="text-4xl font-bold mb-4 text-center whitespace-nowrap">Apex Legends Randomizer</h1>
+  <div class="relative w-full max-w-md p-4 mx-auto">
+    <h1 class="text-4xl font-bold mb-4 text-center whitespace-nowrap">Random Movie Picker</h1>
     <div id="randomizer" class="space-y-4 p-4">
-      <!-- Placeholder area: fixed square, grey background -->
-      <div id="imageWrapper" class="w-full flex items-center justify-center bg-gray-700 rounded overflow-hidden" style="aspect-ratio:1/1;">
-        <img id="legendImage" src="" alt="" class="hidden w-full h-full object-contain rounded" />
+      <!-- Poster Placeholder: fixed square, grey background -->
+      <div id="posterWrapper" class="w-full flex items-center justify-center bg-gray-700 rounded overflow-hidden" style="aspect-ratio:2/3;">
+        <img id="moviePoster" src="" alt="" class="hidden w-full h-full object-contain rounded" />
       </div>
 
       <!-- Randomize Button -->
-      <button id="randomizeBtn" class="w-full bg-gray-700 hover:bg-gray-600 text-white rounded py-2 font-medium">Randomize Legend</button>
+      <button id="randomizeBtn" class="w-full bg-gray-700 hover:bg-gray-600 text-white rounded py-2 font-medium">Randomize Movie</button>
 
       <!-- Result Display -->
       <div id="result" class="mt-2 p-4 bg-gray-700 rounded hidden text-center">
-        <p id="legendResult" class="font-semibold text-white"></p>
+        <p id="movieResult" class="font-semibold text-white"></p>
       </div>
-    </div>
+    
+  </div>
   </div>
 
   <!-- Randomizer Logic -->
   <script>
-    const legends = ["Wraith","Caustic","Valkyrie","Rampart"];
-    const legendImages = {
-      wraith:   'https://cdn.jsdelivr.net/gh/bhootjolokia/randomizer@main/images/legends/wraith.png',
-      caustic:  'https://cdn.jsdelivr.net/gh/bhootjolokia/randomizer@main/images/legends/caustic.png',
-      valkyrie: 'https://cdn.jsdelivr.net/gh/bhootjolokia/randomizer@main/images/legends/valkyrie.png',
-      rampart:  'https://cdn.jsdelivr.net/gh/bhootjolokia/randomizer@main/images/legends/rampart.png'
-    };
-
-    const legendImage = document.getElementById("legendImage");
+    // DOM references
+    const moviePoster = document.getElementById("moviePoster");
     const randomizeBtn = document.getElementById("randomizeBtn");
     const resultDiv = document.getElementById("result");
-    const legendResult = document.getElementById("legendResult");
+    const movieResult = document.getElementById("movieResult");
 
-    function pickRandomLegend() {
-      return legends[Math.floor(Math.random() * legends.length)];
+    // TMDb access
+    // TMDb V3 API key (use your API key here)
+    const TMDB_API_KEY = 'a5bcb6d0954832ff317835d1658f5ba0';
+    const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+    let movies = [];
+
+    // Disable button until movies load
+    randomizeBtn.disabled = true;
+
+        // Fetch popular movies using API key
+    fetch(`${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=1`)
+      .then(r => r.json())
+      .then(data => {
+        if (data && Array.isArray(data.results)) {
+          movies = data.results;
+        } else {
+          console.error('Invalid TMDb response', data);
+        }
+      })
+      .catch(err => console.error('Error fetching TMDb', err))
+      .finally(() => {
+        // Enable button after attempt
+        randomizeBtn.disabled = false;
+      })
+
+    // Helper to pick random movie
+    function pickRandomMovie() {
+      return movies.length ? movies[Math.floor(Math.random() * movies.length)] : null;
     }
 
     const animationCount = 20;
     const animationSpeed = 100;
 
     randomizeBtn.addEventListener("click", () => {
-      legendImage.classList.remove('hidden');
+      const interimImage = () => {
+        const m = pickRandomMovie();
+        if (!m) return;
+        moviePoster.src = m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : '';
+        moviePoster.alt = m.title;
+        movieResult.textContent = m.title;
+      };
+
+      // Reveal poster
+      moviePoster.classList.remove('hidden');
       randomizeBtn.disabled = true;
-      resultDiv.classList.add("hidden");
-      legendImage.classList.add('slot-flip');
+      resultDiv.classList.add('hidden');
+      moviePoster.classList.add('slot-flip');
 
       let flips = 0;
       const interval = setInterval(() => {
-        const interim = pickRandomLegend();
-        legendImage.src = legendImages[interim.toLowerCase()];
-        legendImage.alt = interim;
-        legendResult.textContent = interim;
-
-        if (++flips >= animationCount) {
+        interimImage();
+        flips++;
+        if (flips >= animationCount) {
           clearInterval(interval);
-          legendImage.classList.remove('slot-flip');
-          const finalLegend = pickRandomLegend();
-          legendImage.src = legendImages[finalLegend.toLowerCase()];
-          legendImage.alt = finalLegend;
-          legendResult.textContent = finalLegend;
-          resultDiv.classList.remove("hidden");
+          moviePoster.classList.remove('slot-flip');
+          interimImage();
+          resultDiv.classList.remove('hidden');
           randomizeBtn.disabled = false;
         }
       }, animationSpeed);
     });
   </script>
+  <!-- Attribution (fixed position) -->
+  <div class="absolute bottom-2 right-2 text-xs text-gray-500">
+    Data provided by <a href="https://www.themoviedb.org" target="_blank" class="underline">TMDb</a>
+  </div>
 </body>
 </html>
