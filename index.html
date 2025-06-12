@@ -4,22 +4,11 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Apex Legend Randomizer</title>
+  <title>Apex Legends Randomizer</title>
   <!-- SEO Meta Tags -->
   <meta name="description" content="Generate a random Apex Legends character with our fast and free randomizer. Fun slot-machine animation, no login required!" />
-  <meta name="keywords" content="Apex Legends, randomizer, legend picker, gaming tools, free tools" />
+  <meta name="keywords" content="Apex Legends, randomizer, legend picker, dark theme, gaming tools" />
   <link rel="canonical" href="https://yourdomain.com/" />
-
-  <!-- Open Graph / Social Meta -->
-  <meta property="og:title" content="Apex Legend Randomizer" />
-  <meta property="og:description" content="Need a random legend in Apex Legends? Spin to reveal your next hero with a fun animation!" />
-  <meta property="og:url" content="https://yourdomain.com/" />
-  <meta property="og:image" content="https://yourdomain.com/og-image.png" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Apex Legend Randomizer" />
-  <meta name="twitter:description" content="Randomize your Apex Legends selection in style. No accounts, no hassle." />
-  <meta name="twitter:image" content="https://yourdomain.com/og-image.png" />
 
   <!-- Tailwind & Styles -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -31,35 +20,25 @@
     }
     .slot-flip { animation: slotFlip 0.1s ease-in-out infinite; }
   </style>
-
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" crossorigin="anonymous"></script>
 </head>
-<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col items-center justify-center p-4">
-  <!-- Top Ad Placeholder -->
-  <ins class="adsbygoogle w-full max-w-md mb-4" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXX" data-ad-slot="YYYYYYYYYYY" data-ad-format="auto"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-
-  <!-- Main Container -->
-  <div class="max-w-md w-full bg-white rounded-2xl shadow p-6">
-    <h1 class="text-2xl font-bold mb-4 text-center">Apex Legend Randomizer</h1>
-    <div id="randomizer" class="space-y-4">
-      <div class="flex justify-center">
-        <img id="legendImage"
-             src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150'%3E%3Crect width='300' height='150' fill='%23ddd'/%3E%3Ctext x='150' y='85' font-size='24' text-anchor='middle' fill='%23333'%3ELegend%3C/text%3E%3C/svg%3E"
-             alt="Legend placeholder"
-             class="w-full h-auto object-contain rounded" />
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <h1 class="text-4xl font-bold mb-4 text-center whitespace-nowrap">Apex Legends Randomizer</h1>
+    <div id="randomizer" class="space-y-4 p-4">
+      <!-- Placeholder area: fixed square, grey background -->
+      <div id="imageWrapper" class="w-full flex items-center justify-center bg-gray-700 rounded overflow-hidden" style="aspect-ratio:1/1;">
+        <img id="legendImage" src="" alt="" class="hidden w-full h-full object-contain rounded" />
       </div>
-      <button id="randomizeBtn" class="w-full bg-blue-600 text-white rounded py-2 font-medium">Randomize Legend</button>
-      <div id="result" class="mt-4 p-4 bg-gray-50 rounded hidden text-center">
-        <p id="legendResult" class="font-semibold"></p>
+
+      <!-- Randomize Button -->
+      <button id="randomizeBtn" class="w-full bg-gray-700 hover:bg-gray-600 text-white rounded py-2 font-medium">Randomize Legend</button>
+
+      <!-- Result Display -->
+      <div id="result" class="mt-2 p-4 bg-gray-700 rounded hidden text-center">
+        <p id="legendResult" class="font-semibold text-white"></p>
       </div>
     </div>
   </div>
-
-  <!-- Bottom Ad Placeholder -->
-  <ins class="adsbygoogle w-full max-w-md mt-4" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXX" data-ad-slot="ZZZZZZZZZZZ" data-ad-format="auto"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
   <!-- Randomizer Logic -->
   <script>
@@ -67,46 +46,40 @@
     const legendImages = {
       wraith:   'https://cdn.jsdelivr.net/gh/bhootjolokia/randomizer@main/images/legends/wraith.png',
       caustic:  'https://cdn.jsdelivr.net/gh/bhootjolokia/randomizer@main/images/legends/caustic.png',
-      valkyrie: 'data:image/png;base64,REPLACE_WITH_FULL_BASE64_VALKYRIE',
-      rampart:  'data:image/png;base64,REPLACE_WITH_FULL_BASE64_RAMPART'
+      valkyrie: 'https://cdn.jsdelivr.net/gh/bhootjolokia/randomizer@main/images/legends/valkyrie.png',
+      rampart:  'https://cdn.jsdelivr.net/gh/bhootjolokia/randomizer@main/images/legends/rampart.png'
     };
+
     const legendImage = document.getElementById("legendImage");
     const randomizeBtn = document.getElementById("randomizeBtn");
     const resultDiv = document.getElementById("result");
     const legendResult = document.getElementById("legendResult");
 
-    function generateSVGDataURI(name) {
-      const svg = `<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="300" height="150"><rect width="300" height="150" fill="#ddd"/><text x="150" y="85" font-size="24" text-anchor="middle" fill="#333">${name}</text></svg>`;
-      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
-    }
-
-    function getImageFor(name) {
-      const key = name.toLowerCase().replace(/\s/g,'-');
-      return legendImages[key] || generateSVGDataURI(name);
-    }
-
     function pickRandomLegend() {
-      return legends[Math.floor(Math.random()*legends.length)];
+      return legends[Math.floor(Math.random() * legends.length)];
     }
 
     const animationCount = 20;
     const animationSpeed = 100;
 
     randomizeBtn.addEventListener("click", () => {
+      legendImage.classList.remove('hidden');
       randomizeBtn.disabled = true;
       resultDiv.classList.add("hidden");
       legendImage.classList.add('slot-flip');
+
       let flips = 0;
       const interval = setInterval(() => {
         const interim = pickRandomLegend();
-        legendImage.src = getImageFor(interim);
+        legendImage.src = legendImages[interim.toLowerCase()];
         legendImage.alt = interim;
         legendResult.textContent = interim;
+
         if (++flips >= animationCount) {
           clearInterval(interval);
           legendImage.classList.remove('slot-flip');
           const finalLegend = pickRandomLegend();
-          legendImage.src = getImageFor(finalLegend);
+          legendImage.src = legendImages[finalLegend.toLowerCase()];
           legendImage.alt = finalLegend;
           legendResult.textContent = finalLegend;
           resultDiv.classList.remove("hidden");
