@@ -48,11 +48,11 @@
   <div class="max-w-md w-full bg-white rounded-2xl shadow p-6">
     <h1 class="text-2xl font-bold mb-4 text-center">Apex Legend Randomizer</h1>
     <div id="randomizer" class="space-y-4">
-      <div class="flex justify-center overflow-hidden">
+      <div class="flex justify-center">
         <img id="legendImage"
              src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150'%3E%3Crect width='300' height='150' fill='%23ddd'/%3E%3Ctext x='150' y='85' font-size='24' text-anchor='middle' fill='%23333'%3ELegend%3C/text%3E%3C/svg%3E"
              alt="Legend placeholder"
-             class="w-full h-48 object-cover rounded" />
+             class="w-full h-auto max-h-64 object-contain rounded" />
       </div>
       <button id="randomizeBtn" class="w-full bg-blue-600 text-white rounded py-2 font-medium">Randomize Legend</button>
       <div id="result" class="mt-4 p-4 bg-gray-50 rounded hidden text-center">
